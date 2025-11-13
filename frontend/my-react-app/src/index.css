@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;800&display=swap');
+
+@font-face {
+  font-family: "rawgly";
+  src: url("/fonts/RawglyRegular-MVyWP.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-black text-white antialiased;
+  font-family: Montserrat, ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: rawgly, Montserrat, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Utility to recreate the login gradient background */
+.login-gradient {
+  background: radial-gradient(circle, rgba(234, 150, 52, 1) 0%, rgba(158, 96, 41, 1) 100%);
+}

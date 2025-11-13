@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap');
+
+@font-face {
+  font-family: "rawgly"; /* 👈 name you’ll use in CSS */
+  /* Updated path for Vite public folder */
+  src: url("/fonts/RawglyRegular-MVyWP.otf") format("opentype"); 
+  font-weight: normal;
+  font-style: normal;
+}
+
+h3 {
+  color: white;
+  font-family: rawgly;
+  font-size: 30px;
+}
+
+p {
+  color: white;
+  font-family: rawgly;
+  font-size: 15px;
+}
+
+.navigation{
+z-index: 4;
+display: flex;
+flex-direction: column;
+
+}
+
+.nav-item{
+  height: 40px;
+  margin: 1px;
+  align-content: center;
+  gap: 0px;
+}
+
+.nav-item:hover {
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover::before {
+  content: "-";
+  /* margin-left: 5px; */
+  transition: all 0.3s ease;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns:17% 50% 33%;
+  height: 100vh;
+  background: hsla(38, 69%, 51%, 1);
+
+  background: radial-gradient(
+    circle,
+    hsla(38, 69%, 51%, 1) 0%,
+    hsla(28, 55%, 40%, 1) 100%
+  );
+
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.left_coln {
+  display: grid;
+
+  justify-content: space-between;
+
+  align-content: space-between;
+  margin-top: 30px;
+  margin-left: 90px;
+}
+
+.center_coln {
+  position: relative;
+  /* overflow: visible; */
+  align-content: center;
+  align-items: center;
+}
+
+#login_model {
+  height: 101%;
+  position: absolute;
+  top: 0%;
+  left: -50%;
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+}
+
+.right_coln {
+  background: rgba(0, 0, 0, 0.212);
+  backdrop-filter: blur(6px);
+
+  z-index: 3;
+  /* border-radius: 0px 24px 24px 0px; */
+  color: rgb(255, 255, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap');
+
+.welcome-text {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.8;
+    font-size: 25px;
+}
+
+.bold {
+  font-weight: 800;
+}
+
+.thin {
+  font-weight: 200;
+}
+
+.login_wrap {
+  width: 310px;
+  height: 520px;
+  display: grid;
+  align-content: space-between;
+  /* padding-left: 20px; */
+}
+
+.icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: white;
+}
+
+.login_mail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.6);
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.login_pass {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.6);
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.login_mail input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+  width: 100%;
+}
+
+.login_mail input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login_pass input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+  width: 100%;
+}
+
+.login_pass input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.orstyle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0.8;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin: 20px 0;
+}
+
+.orstyle::before,
+.orstyle::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  margin: 0 10px;
+}
+
+.other_meth {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  height: 60px;
+}
+
+.signlogostyle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50% 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+
+.signlogostyle img {
+  width: 25px;
+  height: 25px;
+  filter: brightness(0)  invert(1);
+  transition: all 0.3s ease;
+}
+
+.signlogostyle:hover {
+  background-color: white;
+  width: 55px;
+  height: 55px;
+}
+
+
+.signlogostyle:hover img {
+  filter: invert(0);
+    width: 30px;
+  height: 30px;
+}
+
+
+#signtologinlink{
+    cursor: pointer;
+}
+
+
+html,
+body {
+  background-color: #000;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* * {
+  border: 1px dashed crimson;
+} 
+*/
