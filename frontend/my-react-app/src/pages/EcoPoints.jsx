@@ -19,14 +19,18 @@ export default function EcoPoints() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get("/eco_points");
-        // Filter and validate transaction types
-        const validTransactions = (data.transactions || []).map((t) => ({
-          ...t,
-          type: TRANSACTION_TYPES.includes(t.type) ? t.type : "Earn",
-        }));
+        const totalRes = await api.get("/eco_points");
+        const transRes = await api.get("/eco_points/transactions?limit=10");
+
+        const validTransactions = (transRes.data.transactions || []).map(
+          (t) => ({
+            ...t,
+            type: TRANSACTION_TYPES.includes(t.type) ? t.type : "Earn",
+          })
+        );
+
+        setTotal(totalRes.data.total || 0);
         setTransactions(validTransactions);
-        setTotal(data.total || 0);
       } catch (err) {
         console.error("Failed to load eco points:", err);
       }
@@ -85,17 +89,36 @@ export default function EcoPoints() {
             </button>
           ))}
         </div>
-
         <div className="h-64 mt-4">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <BarChart data={groupedData}>
+              <XAxis dataKey="name" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(20, 20, 20, 0.8)", // dark semi-transparent background
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                }}
+                itemStyle={{ color: "#f0f0f0" }} // text color
+                labelStyle={{ color: "#d27a18", fontWeight: 600 }} // date label color
+                cursor={{ fill: "rgba(255,255,255,0.05)" }} // soft hover highlight
+              />
+              <Bar dataKey="points" fill="#d27a18" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* <div className="h-64 mt-4">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={groupedData}>
               <XAxis dataKey="name" stroke="#ccc" />
               <YAxis stroke="#ccc" />
               <Tooltip />
               <Bar dataKey="points" fill="#d27a18" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </div> */}
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-lg overflow-x-auto">
@@ -116,7 +139,7 @@ export default function EcoPoints() {
                   {TRANSACTION_TYPES.includes(t.type) ? t.type : "Earn"}
                 </td>
                 <td className="p-3">{t.points}</td>
-                <td className="p-3">{t.note}</td>
+                <td className="p-3">{t.reason}</td>
               </tr>
             ))}
           </tbody>

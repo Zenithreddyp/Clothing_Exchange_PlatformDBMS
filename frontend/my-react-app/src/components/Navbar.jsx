@@ -40,7 +40,7 @@ export default function Navbar() {
               <NavLink to="/" className={linkClass}>Home</NavLink>
               <NavLink to="/items" className={linkClass}>Items</NavLink>
               <NavLink to="/exchange" className={linkClass}>Exchange</NavLink>
-              <NavLink to="/donations" className={linkClass}>Donations</NavLink>
+              {/* <NavLink to="/donations" className={linkClass}>Donations</NavLink> */}
               <NavLink to="/eco-points" className={linkClass}>Points</NavLink>
               <NavLink to="/messages" className={linkClass}>Messages</NavLink>
               <NavLink to="/profile" className={linkClass}>Profile</NavLink>

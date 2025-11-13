@@ -109,6 +109,8 @@ def get_transactions():
                 "donation_id": txn["donation_id"]
             })
 
+            # print(formatted_transactions)
+
         return jsonify({
             "transactions": formatted_transactions,
             "total": total,

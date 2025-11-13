@@ -51,7 +51,7 @@ export default function ProductPage() {
   const handleExchangeSelect = async (selectedItem) => {
     try {
       setShowExchangeModal(false);
-      
+
       // Create exchange request via API
       const response = await api.post("/exchange", {
         requested_item_id: product.id,
@@ -64,7 +64,10 @@ export default function ProductPage() {
         // navigate("/exchange-requests");
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.error || err.message || "Failed to create exchange request";
+      const errorMessage =
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to create exchange request";
       toast.error(errorMessage);
       console.error("Exchange request error:", err);
     }
@@ -159,11 +162,18 @@ export default function ProductPage() {
                   onClick={async () => {
                     try {
                       // Create or get conversation with seller
-                      const { data } = await api.post(`/conversations/${product.seller.id}`);
+                      const { data } = await api.post(
+                        `/conversations/${product.seller.id}`
+                      );
                       // Navigate to messages page with the conversation
-                      navigate(`/messages?conversation=${data.conversation_id}`);
+                      navigate(
+                        `/messages?conversation=${data.conversation_id}`
+                      );
                     } catch (err) {
-                      const errorMessage = err.response?.data?.error || err.message || "Failed to start conversation";
+                      const errorMessage =
+                        err.response?.data?.error ||
+                        err.message ||
+                        "Failed to start conversation";
                       toast.error(errorMessage);
                     }
                   }}

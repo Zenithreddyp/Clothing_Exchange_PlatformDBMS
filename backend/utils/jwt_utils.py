@@ -6,7 +6,7 @@ import os
 # Secret key for JWT - in production, use environment variable
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
 JWT_ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 15  # 15 minutes
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 15 minutes
 REFRESH_TOKEN_EXPIRE_DAYS = 7  # 7 days
 
 

@@ -74,8 +74,19 @@ export default function UserProfile() {
           src="/media/image.png"
           alt="Chat icon"
           className="w-5 h-5 filter invert cursor-pointer hover:opacity-80 transition"
-          onClick={() => navigate(`/messages?user=${user.user_id}`)}
-
+          onClick={async () => {
+            try {
+              // Create or get conversation with the profile user
+              const { data } = await api.post(`/conversations/${id}`);
+              navigate(`/messages?conversation=${data.conversation_id}`);
+            } catch (err) {
+              const errorMessage =
+                err.response?.data?.error ||
+                err.message ||
+                "Failed to start conversation";
+              toast.error(errorMessage);
+            }
+          }}
         />
       </div>
 

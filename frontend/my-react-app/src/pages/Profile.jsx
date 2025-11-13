@@ -17,9 +17,17 @@ export default function Profile() {
   //   })();
   // }, []);
 
-  useEffect(() => {
-    refreshEcoPoints();
-  }, [refreshEcoPoints]);
+useEffect(() => {
+  (async () => {
+    try {
+      await refreshEcoPoints();
+      const { data } = await api.get("/exchange?status=Accepted");
+      setCompleted(data?.exchanges || []);
+    } catch (err) {
+      console.error("Failed to load profile data:", err);
+    }
+  })();
+}, [refreshEcoPoints]);
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
