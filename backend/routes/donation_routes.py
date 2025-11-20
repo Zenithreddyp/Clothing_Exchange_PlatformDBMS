@@ -27,7 +27,6 @@ def get_donations():
         donations = cursor.fetchall()
         cursor.close()
 
-        # Format response for frontend
         formatted_donations = []
         for donation in donations:
             formatted_donations.append({
@@ -55,11 +54,9 @@ def create_donation():
         user_id = request.current_user.get("user_id")
         data = request.get_json()
         
-        # Accept both 'title' (for frontend compatibility) and 'item_id'
         item_id = data.get("item_id")
         recipient = data.get("recipient", "")
         
-        # If title is provided, try to find item by title (for backward compatibility)
         if not item_id and data.get("title"):
             cursor = conn.cursor(dictionary=True)
             cursor.execute(
@@ -76,7 +73,6 @@ def create_donation():
 
         cursor = conn.cursor(dictionary=True)
         
-        # Check if item exists and belongs to user
         cursor.execute(
             "SELECT item_id, item_status FROM clothing_items WHERE item_id = %s AND user_id = %s",
             (item_id, user_id)
@@ -91,7 +87,6 @@ def create_donation():
             cursor.close()
             return jsonify({"error": "Item has already been donated"}), 400
 
-        # Create donation
         cursor.execute(
             """
             INSERT INTO donation (donor_id, item_id, recipient, donation_date)
@@ -101,14 +96,12 @@ def create_donation():
         )
         donation_id = cursor.lastrowid
         
-        # Update item status to 'Donated'
         cursor.execute(
             "UPDATE clothing_items SET item_status = 'Donated' WHERE item_id = %s",
             (item_id,)
         )
         
-        # Award eco points for donation
-        points = 50  # Points for donation
+        points = 50 
         cursor.execute(
             """
             INSERT INTO eco_point_transaction 
@@ -118,7 +111,6 @@ def create_donation():
             (user_id, donation_id, points)
         )
         
-        # Update user's eco_points
         cursor.execute(
             "UPDATE users SET eco_points = eco_points + %s WHERE user_id = %s",
             (points, user_id)

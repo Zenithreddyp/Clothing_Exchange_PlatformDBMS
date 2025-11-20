@@ -14,10 +14,8 @@ def get_eco_points():
     try:
 
         user_id = request.current_user.get("user_id")
-        # user_id = request.current_user.get("user_id")
         cursor = conn.cursor(dictionary=True)
         
-        # Get user's total eco points
         cursor.execute("SELECT eco_points FROM users WHERE user_id = %s", (user_id,))
         user = cursor.fetchone()
         total_points = user["eco_points"] if user else 0
@@ -82,7 +80,6 @@ def get_transactions():
         )
         total = cursor.fetchone()["total"]
         
-        # Get transactions
         cursor.execute(
             """
             SELECT transaction_id, transaction_type, points, reason, transaction_date,

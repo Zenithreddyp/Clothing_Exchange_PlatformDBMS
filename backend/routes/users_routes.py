@@ -23,7 +23,6 @@ def register():
         if not name or not email or not password:
             return jsonify({"error": "Name, email, and password are required"}), 400
 
-        # Check if user already exists
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         existing_user = cursor.fetchone()
@@ -43,13 +42,11 @@ def register():
         )
         conn.commit()
 
-        # Get the newly created user
         user_id = cursor.lastrowid
         cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
         user = cursor.fetchone()
         cursor.close()
 
-        # Generate tokens
         access_token = generate_access_token(user["user_id"], user["email"])
         refresh_token = generate_refresh_token(user["user_id"], user["email"])
 
@@ -78,7 +75,6 @@ def register():
 def login():
     try:
         data = request.get_json()
-        # Accept both 'email' and 'loginId' for flexibility
         login_id = data.get("email") or data.get("loginId")
         password = data.get("password")
 
@@ -87,7 +83,6 @@ def login():
 
         cursor = conn.cursor(dictionary=True)
 
-        # Check if login_id is an email or phone
         if re.match(r"[^@]+@[^@]+\.[^@]+", login_id):
             query = "SELECT * FROM users WHERE email = %s"
         else:
@@ -103,7 +98,6 @@ def login():
         if not bcrypt.check_password_hash(user["password"], password):
             return jsonify({"error": "Invalid password"}), 401
 
-        # Generate tokens
         access_token = generate_access_token(user["user_id"], user["email"])
         refresh_token = generate_refresh_token(user["user_id"], user["email"])
 
@@ -113,7 +107,7 @@ def login():
                     "message": "Login successful",
                     "access_token": access_token,
                     "refresh_token": refresh_token,
-                    "token": access_token,  # Keep for backward compatibility
+                    "token": access_token,  
                     "user": {
                         "user_id": user["user_id"],
                         "name": user["name"],
@@ -123,7 +117,7 @@ def login():
                     },
                     "eco_points": user.get(
                         "eco_points", 0
-                    ),  # Also include at top level for frontend
+                    ), 
                 }
             ),
             200,
@@ -142,12 +136,10 @@ def refresh():
         if not refresh_token:
             return jsonify({"error": "Refresh token is required"}), 400
 
-        # Verify refresh token
         payload = verify_token(refresh_token, token_type="refresh")
         if not payload:
             return jsonify({"error": "Invalid or expired refresh token"}), 401
 
-        # Get user from database
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             "SELECT * FROM users WHERE user_id = %s", (payload.get("user_id"),)
@@ -158,14 +150,13 @@ def refresh():
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        # Generate new access token
         access_token = generate_access_token(user["user_id"], user["email"])
 
         return (
             jsonify(
                 {
                     "access_token": access_token,
-                    "token": access_token,  # Keep for backward compatibility
+                    "token": access_token, 
                 }
             ),
             200,
@@ -211,9 +202,7 @@ def get_user_by_id(user_id):
     try:
         cursor = conn.cursor(
             dictionary=True, buffered=True
-        )  # ✅ buffered fixes “commands out of sync”
-
-        # 1️⃣ Get user details
+        ) 
         cursor.execute(
             """
             SELECT user_id, name, email, phone, eco_points
@@ -228,7 +217,6 @@ def get_user_by_id(user_id):
             cursor.close()
             return jsonify({"error": "User not found"}), 404
 
-        # ✅ Create a *new* cursor for the next query
         cursor2 = conn.cursor(dictionary=True, buffered=True)
         cursor2.execute(
             """

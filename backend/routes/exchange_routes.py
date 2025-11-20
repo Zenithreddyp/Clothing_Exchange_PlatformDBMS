@@ -33,7 +33,6 @@ def get_exchange_requests():
             return jsonify({"exchanges": exchanges}), 200
         
         if filter_type == "sent":
-            # Only requests sent by current user
             query = """
             SELECT er.exchange_id, er.requester_id, er.owner_id, er.requested_item_id,
                    er.offered_item_id, er.offerd_points, er.exchange_status,
@@ -53,7 +52,6 @@ def get_exchange_requests():
             """
             cursor.execute(query, (user_id,))
         elif filter_type == "received":
-            # Only requests received by current user
             query = """
             SELECT er.exchange_id, er.requester_id, er.owner_id, er.requested_item_id,
                    er.offered_item_id, er.offerd_points, er.exchange_status,
@@ -73,7 +71,6 @@ def get_exchange_requests():
             """
             cursor.execute(query, (user_id,))
         else:
-            # All requests (sent or received)
             query = """
             SELECT er.exchange_id, er.requester_id, er.owner_id, er.requested_item_id,
                    er.offered_item_id, er.offerd_points, er.exchange_status,
@@ -96,7 +93,6 @@ def get_exchange_requests():
         requests = cursor.fetchall()
         cursor.close()
 
-        # Format for frontend
         formatted_requests = []
         for req in requests:
             formatted_requests.append(
@@ -160,7 +156,6 @@ def create_exchange_request():
 
         cursor = conn.cursor(dictionary=True)
 
-        # Check if requested item exists and is available
         cursor.execute(
             """
             SELECT user_id, item_status, title
@@ -181,7 +176,6 @@ def create_exchange_request():
             cursor.close()
             return jsonify({"error": "You cannot request your own item"}), 400
 
-        # Check if offered item exists and belongs to requester (if provided)
         if offered_item_id:
             cursor.execute(
                 """
@@ -205,7 +199,6 @@ def create_exchange_request():
                 cursor.close()
                 return jsonify({"error": "Offered item is not available"}), 400
 
-        # Check if requester has enough points (if offering points)
         if offered_points and offered_points > 0:
             cursor.execute(
                 "SELECT eco_points FROM users WHERE user_id = %s", (requester_id,)
@@ -215,7 +208,6 @@ def create_exchange_request():
                 cursor.close()
                 return jsonify({"error": "Insufficient eco points"}), 400
 
-        # Check for existing pending request
         cursor.execute(
             """
             SELECT exchange_id FROM exchangerequest
@@ -231,7 +223,6 @@ def create_exchange_request():
                 400,
             )
 
-        # Create exchange request
         cursor.execute(
             """
             INSERT INTO exchangerequest
@@ -273,7 +264,6 @@ def accept_exchange(exchange_id):
 
         cursor = conn.cursor(dictionary=True)
 
-        # Get exchange request with item costs
         cursor.execute(
             """
             SELECT er.*, 
@@ -294,7 +284,6 @@ def accept_exchange(exchange_id):
             cursor.close()
             return jsonify({"error": "Exchange request not found"}), 404
 
-        # Check if user is the owner of the requested item
         if exchange["owner_id"] != user_id:
             cursor.close()
             return (
@@ -317,7 +306,6 @@ def accept_exchange(exchange_id):
                 400,
             )
 
-        # Update exchange status
         cursor.execute(
             """
             UPDATE exchangerequest
@@ -327,7 +315,6 @@ def accept_exchange(exchange_id):
             (exchange_id,),
         )
 
-        # Update item statuses to 'Exchanged' when exchange is accepted
         cursor.execute(
             "UPDATE clothing_items SET item_status = 'Exchange' WHERE item_id = %s",
             (exchange["requested_item_id"],),
@@ -339,21 +326,17 @@ def accept_exchange(exchange_id):
                 (exchange["offered_item_id"],),
             )
 
-        # Handle eco points if offered
         if exchange["offerd_points"] and exchange["offerd_points"] > 0:
-            # Deduct points from requester
             cursor.execute(
                 "UPDATE users SET eco_points = eco_points - %s WHERE user_id = %s",
                 (exchange["offerd_points"], exchange["requester_id"]),
             )
 
-            # Add points to owner
             cursor.execute(
                 "UPDATE users SET eco_points = eco_points + %s WHERE user_id = %s",
                 (exchange["offerd_points"], exchange["owner_id"]),
             )
 
-            # Record transaction for requester (spend)
             cursor.execute(
                 """
                 INSERT INTO eco_point_transaction
@@ -363,7 +346,6 @@ def accept_exchange(exchange_id):
                 (exchange["requester_id"], exchange_id, exchange["offerd_points"]),
             )
 
-            # Record transaction for owner (earn)
             cursor.execute(
                 """
                 INSERT INTO eco_point_transaction
@@ -373,23 +355,19 @@ def accept_exchange(exchange_id):
                 (exchange["owner_id"], exchange_id, exchange["offerd_points"]),
             )
 
-        # Calculate bonus points: 10% of the total exchange value
         requested_cost = exchange.get("requested_item_cost") or 0
         offered_cost = exchange.get("offered_item_cost") or 0
         offered_points_value = exchange.get("offerd_points") or 0
 
-        # Total value includes both item costs and any points offered
         total_value = requested_cost + offered_cost + offered_points_value
 
-        # Calculate 10% bonus (minimum 1 point if there's any value)
         if total_value > 0:
             bonus_points = max(
                 1, int(total_value * 0.10)
-            )  # 10% of total value, minimum 1 point
+            ) 
         else:
-            bonus_points = 0  # No bonus if items have no value
+            bonus_points = 0
 
-        # Award bonus points to both users
         if bonus_points > 0:
             cursor.execute(
                 "UPDATE users SET eco_points = eco_points + %s WHERE user_id = %s",
@@ -400,7 +378,6 @@ def accept_exchange(exchange_id):
                 (bonus_points, exchange["owner_id"]),
             )
 
-            # Record eco point transactions for bonus
             cursor.execute(
                 """
                 INSERT INTO eco_point_transaction
@@ -446,7 +423,6 @@ def reject_exchange(exchange_id):
 
         cursor = conn.cursor(dictionary=True)
 
-        # Get exchange request
         cursor.execute(
             "SELECT * FROM exchangerequest WHERE exchange_id = %s", (exchange_id,)
         )
@@ -456,7 +432,6 @@ def reject_exchange(exchange_id):
             cursor.close()
             return jsonify({"error": "Exchange request not found"}), 404
 
-        # Check if user is the owner of the requested item
         if exchange["owner_id"] != user_id:
             cursor.close()
             return (
@@ -479,7 +454,6 @@ def reject_exchange(exchange_id):
                 400,
             )
 
-        # Update exchange status
         cursor.execute(
             """
             UPDATE exchangerequest

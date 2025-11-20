@@ -17,7 +17,6 @@ def get_messages():
         cursor = conn.cursor(dictionary=True)
         
         if list_mode:
-            # Return list of conversations
             query = """
             SELECT c.conversation_id,
                    CASE 
@@ -56,8 +55,7 @@ def get_messages():
             return jsonify(formatted_conversations), 200
         
         elif conversation_id:
-            # Return messages for a specific conversation
-            # First verify user is part of this conversation
+
             cursor.execute(
                 """
                 SELECT conversation_id FROM Conversations
@@ -71,7 +69,6 @@ def get_messages():
                 cursor.close()
                 return jsonify({"error": "Conversation not found or access denied"}), 404
             
-            # Get messages
             cursor.execute(
                 """
                 SELECT message_id, sender_id, message_text, timestamp
@@ -112,16 +109,14 @@ def send_message():
         
         conversation_id = data.get("conversation_id")
         message_text = data.get("text") or data.get("message_text")
-        other_user_id = data.get("other_user_id")  # For creating new conversation
+        other_user_id = data.get("other_user_id")
         
         if not message_text:
             return jsonify({"error": "message text is required"}), 400
         
         cursor = conn.cursor(dictionary=True)
         
-        # If conversation_id is provided, use existing conversation
         if conversation_id:
-            # Verify user is part of this conversation
             cursor.execute(
                 """
                 SELECT conversation_id FROM Conversations
@@ -135,13 +130,11 @@ def send_message():
                 cursor.close()
                 return jsonify({"error": "Conversation not found or access denied"}), 404
         
-        # If no conversation_id but other_user_id is provided, create or find conversation
         elif other_user_id:
             if other_user_id == user_id:
                 cursor.close()
                 return jsonify({"error": "You cannot message yourself"}), 400
             
-            # Check if conversation already exists
             cursor.execute(
                 """
                 SELECT conversation_id FROM Conversations
@@ -154,7 +147,6 @@ def send_message():
             if existing:
                 conversation_id = existing["conversation_id"]
             else:
-                # Create new conversation
                 cursor.execute(
                     """
                     INSERT INTO Conversations (user1_id, user2_id, start_time)
@@ -168,7 +160,6 @@ def send_message():
             cursor.close()
             return jsonify({"error": "Either conversation_id or other_user_id is required"}), 400
         
-        # Insert message
         cursor.execute(
             """
             INSERT INTO Messages (conversation_id, sender_id, message_text, timestamp)
@@ -185,7 +176,7 @@ def send_message():
             "conversation_id": conversation_id,
             "text": message_text,
             "is_self": True,
-            "created_at": None  # Will be set by database
+            "created_at": None 
         }), 201
     except Exception as e:
         return jsonify({"error": "Database error", "details": str(e)}), 500
@@ -253,7 +244,6 @@ def create_conversation(other_user_id):
         
         cursor = conn.cursor(dictionary=True)
         
-        # Check if conversation already exists
         cursor.execute(
             """
             SELECT conversation_id FROM Conversations
@@ -270,7 +260,6 @@ def create_conversation(other_user_id):
                 "message": "Conversation already exists"
             }), 200
         
-        # Create new conversation
         cursor.execute(
             """
             INSERT INTO Conversations (user1_id, user2_id, start_time)

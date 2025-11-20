@@ -9,7 +9,6 @@ clothing_bp = Blueprint("clothing_bp", __name__)
 @token_required
 def addcloth():
     data = request.get_json()
-    # Get user_id from token instead of request body
     user_id = request.current_user.get("user_id")
     title = data.get("title")
     description = data.get("description")
@@ -22,7 +21,7 @@ def addcloth():
     pickup_longitude = data.get("pickup_longitude")
     item_condition = data.get("item_condition")  # ('New', 'Gently Used', 'Worn')
     image_url = data.get("image_url")
-    item_status = data.get("item_status", "Available")  # Default to 'Available'
+    item_status = data.get("item_status", "Available")
 
     required_fields = ["title", "category", "item_condition"]
     for field in required_fields:
@@ -60,7 +59,6 @@ def addcloth():
         cursor.execute(query, values)
         conn.commit()
 
-        # Get the newly created item
         item_id = cursor.lastrowid
         cursor.close()
 
@@ -105,7 +103,6 @@ def update_cloth(item_id):
     try:
         cursor = conn.cursor(dictionary=True)
 
-        # First check if item exists and belongs to user
         cursor.execute(
             "SELECT user_id FROM clothing_items WHERE item_id = %s", (item_id,)
         )
@@ -177,7 +174,7 @@ def get_clothes():
     """Get all clothing items with optional filters"""
     try:
         category = request.args.get("category")
-        statuses = request.args.get("item_status")  # e.g. "exchange,donation"
+        statuses = request.args.get("item_status")
         exclude_user = request.args.get("exclude_user", type=int)
         size = request.args.get("size")
         search = request.args.get("search")
@@ -218,7 +215,6 @@ def get_clothes():
             query += " LIMIT %s"
             params.append(limit)
 
-        # print("Executing:", query, params)
 
         cursor.execute(query, params)
         items = cursor.fetchall()
@@ -246,7 +242,6 @@ def delete_cloth(item_id):
         user_id = request.current_user.get("user_id")
         cursor = conn.cursor(dictionary=True)
 
-        # Check if item exists and belongs to user
         cursor.execute(
             "SELECT user_id FROM clothing_items WHERE item_id = %s", (item_id,)
         )

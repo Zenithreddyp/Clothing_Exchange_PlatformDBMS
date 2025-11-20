@@ -19,7 +19,6 @@ def get_tables():
     return jsonify({"tables": table_names}, 200)
 
 
-# Register all blueprints
 app.register_blueprint(users_bp, url_prefix="/api/users")
 app.register_blueprint(clothing_bp, url_prefix="/api")
 app.register_blueprint(donation_bp, url_prefix="/api")
