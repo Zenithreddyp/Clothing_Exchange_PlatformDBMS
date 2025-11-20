@@ -27,7 +27,7 @@ export default function Home() {
       {/* Header Stats */}
       <section className="rounded-2xl p-6 login-gradient">
         <h1 className="font-display text-3xl">Sustainable Clothing Exchange</h1>
-        <p className="text-white/80 mt-2">
+        <p className="font-sans text-white/80 mt-2">
           Exchange or donate your clothes and earn eco-points.
         </p>
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -65,9 +65,8 @@ export default function Home() {
           showActions={false}
           onClose={() => setSelectedItem(null)}
           onOpenProduct={(item) => {
-          
-          window.location.href = `/product/${item.item_id || item.id}`;
-        }}
+            window.location.href = `/product/${item.item_id || item.id}`;
+          }}
         />
       )}
     </div>
