@@ -1,0 +1,23 @@
+# Python virtual environment
+myenv/
+env/
+venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Frontend folders to ignore
+basicstuffs/
+
+# Documents
+SCEP final2 - Google Docs.pdf
+
+# Node (if any)
+node_modules/
+
+# IDE
+.vscode/
